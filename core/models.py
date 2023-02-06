@@ -36,7 +36,29 @@ class Quiz(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=511)
     expected_answer = models.TextField()
-    value = models.IntegerField()
+    value = models.PositiveIntegerField()
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class Course(models.Model):
+    name = models.CharField(max_length=255)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="courses")
+    invitation_token = models.CharField(
+        max_length=50, default=generate_invitation_token, unique=True
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Task(models.Model):
+    title = models.CharField(max_length=255)
+    deadline = models.DateTimeField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
