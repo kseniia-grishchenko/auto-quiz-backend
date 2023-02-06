@@ -1,21 +1,21 @@
+import secrets
+
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, Q
 
 
+def generate_invitation_token() -> str:
+    return secrets.token_urlsafe(32)[:32]
+
+
 class Subject(models.Model):
     name = models.CharField(max_length=255)
     teachers = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="subjects")
-
-    def __str__(self) -> str:
-        return self.name
-
-
-class Course(models.Model):
-    name = models.CharField(max_length=255)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="courses")
+    invitation_token = models.CharField(
+        max_length=32, default=generate_invitation_token, unique=True
+    )
 
     def __str__(self) -> str:
         return self.name
