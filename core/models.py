@@ -43,9 +43,8 @@ class Question(models.Model):
         return self.title
 
 
-class QuizSession(models.Model):
-    deadline = models.DateTimeField()
-    started_at = models.DateTimeField(null=True, blank=True)
+class TaskSession(models.Model):
+    started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
