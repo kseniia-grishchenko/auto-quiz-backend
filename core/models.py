@@ -72,7 +72,7 @@ class TaskSession(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return self.quiz.name + " " + self.user.email
+        return self.task.title + " " + self.user.email
 
     class Meta:
         constraints = [
