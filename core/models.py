@@ -75,6 +75,7 @@ class TaskSession(models.Model):
         return self.task.title + " " + self.user.email
 
     class Meta:
+        unique_together = ("user", "task")
         constraints = [
             CheckConstraint(
                 check=Q(
