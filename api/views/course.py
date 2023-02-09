@@ -30,9 +30,9 @@ class CourseViewSet(viewsets.ModelViewSet):
         return CourseSerializer
 
     def perform_create(self, serializer: CourseSerializer) -> Course:
-        subject = serializer.save()
-        subject.users.add(self.request.user)
-        return subject
+        course = serializer.save()
+        course.users.add(self.request.user)
+        return course
 
     @action(detail=False, methods=["GET"])
     def join(self, request: Request) -> Response:
