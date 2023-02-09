@@ -98,7 +98,7 @@ class UserAnswer(models.Model):
     comment = models.TextField()
     is_adjusted = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    quiz_session = models.ForeignKey(QuizSession, on_delete=models.CASCADE)
+    task_session = models.ForeignKey(TaskSession, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return (
@@ -108,4 +108,4 @@ class UserAnswer(models.Model):
         )
 
     class Meta:
-        unique_together = ("question", "quiz_session")
+        unique_together = ("question", "task_session")
