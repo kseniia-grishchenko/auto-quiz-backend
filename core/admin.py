@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.models import Subject, Course, Quiz, Question, QuizSession, UserAnswer
+from core.models import Subject, Course, Quiz, Question, TaskSession, UserAnswer, Task
 
 
 @admin.register(Subject)
@@ -23,13 +23,18 @@ class QuizAdmin(admin.ModelAdmin):
     inlines = [QuestionInline]
 
 
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(QuizSession)
-class QuizSessionAdmin(admin.ModelAdmin):
+@admin.register(TaskSession)
+class TaskSessionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
     pass
 
 
