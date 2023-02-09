@@ -85,12 +85,6 @@ class TaskSession(models.Model):
                 ),
                 name="started_at_finished_at_check",
             ),
-            CheckConstraint(
-                check=Q(
-                    Q(started_at__isnull=True) | Q(started_at__lte=models.F("deadline"))
-                ),
-                name="started_at_deadline_check",
-            ),
         ]
 
 
