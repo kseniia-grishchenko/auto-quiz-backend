@@ -274,8 +274,6 @@ fabric.properties
 
 # Unit test / coverage reports
 
-tests.py
-
 # Translations
 
 # Django stuff:

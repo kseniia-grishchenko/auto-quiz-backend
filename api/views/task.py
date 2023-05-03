@@ -9,7 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from api.permissions import IsCourseTeacher, IsCourseUser
+from api.permissions import IsCourseTeacher, IsCourseStudent
 from api.serializers import (
     TaskSerializer,
     TaskDetailSerializer,
@@ -21,7 +21,7 @@ from core.models import Task, Course, TaskSession
 class TaskViewSet(viewsets.ModelViewSet):
     def get_permissions(self) -> list:
         if self.action in ("list", "start", None):
-            permission_classes = [IsCourseUser]
+            permission_classes = [IsCourseStudent]
         else:
             permission_classes = [IsCourseTeacher]
 

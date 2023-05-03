@@ -41,7 +41,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
-    is_teacher = models.BooleanField(default=False)
+    profile_image = models.ImageField(upload_to="profile_images", blank=True, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

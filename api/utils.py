@@ -1,50 +1,22 @@
-from __future__ import annotations
-
 from typing import Type
 
-from rest_framework import status
-from rest_framework.request import Request
-from rest_framework.response import Response
-
+from django.conf import settings
+from rest_framework.exceptions import ValidationError
 from core.models import Subject, Course
 
 
 def invitation_token_verifications(
-    request: Request,
+    invitation_token: str,
+    user: settings.AUTH_USER_MODEL,
     model: Type[Subject] | Type[Course],
     field: str,
-    must_be_teacher: bool,
-) -> Response | None:
-    invitation_token = request.query_params.get("invitation_token", None)
-
-    if not invitation_token:
-        return Response(
-            {"detail": "Provide invitation token!"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
+) -> Subject | Course:
     obj = model.objects.filter(invitation_token=invitation_token).first()
 
     if not obj:
-        return Response(
-            {"detail": "Invitation token is incorrect!"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        raise ValidationError("Invitation token is incorrect!")
 
-    if must_be_teacher and not request.user.is_teacher:
-        return Response(
-            {"detail": "Only teachers can join!"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    if user in getattr(obj, field).all():
+        raise ValidationError(f"You already joined this {model.__name__.lower()}!")
 
-    if request.user in getattr(obj, field).all():
-        return Response(
-            {"detail": f"You already joined this {model.__name__.lower()}!"},
-            status=status.HTTP_204_NO_CONTENT,
-        )
-
-    getattr(obj, field).add(request.user)
-    return Response(
-        {"detail": f"Successfully joined the {model.__name__.lower()}!"},
-        status=status.HTTP_200_OK,
-    )
+    return obj

@@ -16,6 +16,7 @@ class Subject(models.Model):
     invitation_token = models.CharField(
         max_length=50, default=generate_invitation_token, unique=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name
@@ -25,6 +26,7 @@ class Quiz(models.Model):
     name = models.CharField(max_length=255)
     max_duration = models.IntegerField()
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name
@@ -46,13 +48,33 @@ class Question(models.Model):
 class Course(models.Model):
     name = models.CharField(max_length=255)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="courses")
+    users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="courses", through="CourseMembership"
+    )
     invitation_token = models.CharField(
         max_length=50, default=generate_invitation_token, unique=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.name
+
+
+class CourseMembership(models.Model):
+    class UserPermission(models.TextChoices):
+        TEACHER = "teacher"
+        STUDENT = "student"
+        OWNER = "owner"
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    permission = models.CharField(
+        max_length=50, choices=UserPermission.choices, default=UserPermission.STUDENT
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "course")
 
 
 class Task(models.Model):
@@ -60,6 +82,7 @@ class Task(models.Model):
     deadline = models.DateTimeField()
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.title
@@ -99,6 +122,7 @@ class UserAnswer(models.Model):
     is_adjusted = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     task_session = models.ForeignKey(TaskSession, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return (

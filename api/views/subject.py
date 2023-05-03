@@ -1,25 +1,30 @@
 from typing import Type
 
 from django.db.models import QuerySet
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from api.permissions import IsTeacher
-from api.serializers import SubjectSerializer
+from api.serializers import SubjectSerializer, InvitationTokenSerializer
 from api.utils import invitation_token_verifications
 from core.models import Subject
 
 
 class SubjectViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsTeacher,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self) -> QuerySet:
-        return Subject.objects.filter(teachers__in=[self.request.user])
+        return Subject.objects.filter(
+            teachers__in=[self.request.user]
+        ).prefetch_related("teachers")
 
     def get_serializer_class(self) -> Type[Serializer]:
+        if self.action == "join":
+            return InvitationTokenSerializer
+
         return SubjectSerializer
 
     def perform_create(self, serializer: SubjectSerializer) -> Subject:
@@ -27,8 +32,19 @@ class SubjectViewSet(viewsets.ModelViewSet):
         subject.teachers.add(self.request.user)
         return subject
 
-    @action(detail=False, methods=["GET"])
+    @action(detail=False, methods=["POST"])
     def join(self, request: Request) -> Response:
-        return invitation_token_verifications(
-            request, Subject, "teachers", must_be_teacher=True
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        invitation_token = serializer.validated_data["invitation_token"]
+
+        subject = invitation_token_verifications(
+            invitation_token, request.user, Subject, "teachers"
+        )
+
+        subject.teachers.add(request.user)
+        return Response(
+            {"detail": f"Successfully joined the subject!"},
+            status=status.HTTP_200_OK,
         )

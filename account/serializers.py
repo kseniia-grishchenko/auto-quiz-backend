@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "is_staff",
-            "is_teacher",
+            "profile_image",
         )
         read_only_fields = ("is_staff",)
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
@@ -25,9 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update a user, set the password correctly and return it"""
         password = validated_data.pop("password", None)
-        _ = validated_data.pop(
-            "is_teacher", None
-        )  # user cannot change identity after creation
         user = super().update(instance, validated_data)
         if password:
             user.set_password(password)
