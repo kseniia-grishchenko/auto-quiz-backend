@@ -42,10 +42,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "quiz")
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    users = UserSerializer(many=True, read_only=True)
-    subject = SubjectNestedSerializer(many=False, read_only=True)
-
+class CourseCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ("id", "name", "subject", "users", "invitation_token")
@@ -63,6 +60,16 @@ class CourseSerializer(serializers.ModelSerializer):
             permission=CourseMembership.UserPermission.OWNER,
         )
         return course
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    users = UserSerializer(many=True, read_only=True)
+    subject = SubjectNestedSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ("id", "name", "subject", "users", "invitation_token")
+        read_only_fields = ("id", "users", "invitation_token")
 
 
 class CourseMembershipSerializer(serializers.ModelSerializer):

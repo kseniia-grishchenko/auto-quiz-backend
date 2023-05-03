@@ -12,6 +12,7 @@ from rest_framework.serializers import Serializer
 from api.permissions import IsCourseOwner
 from api.serializers import (
     CourseSerializer,
+    CourseCreateSerializer,
     InvitationTokenSerializer,
     CourseDetailSerializer,
     ChangeCourseUserPermissionSerializer,
@@ -40,6 +41,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         if self.action == "retrieve":
             return CourseDetailSerializer
+
+        if self.action == "create":
+            return CourseCreateSerializer
 
         return CourseSerializer
 
