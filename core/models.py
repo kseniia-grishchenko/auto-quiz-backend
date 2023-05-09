@@ -97,6 +97,19 @@ class TaskSession(models.Model):
     def __str__(self) -> str:
         return self.task.title + " " + self.user.email
 
+    @property
+    def total_mark(self) -> float:
+        if self.finished_at is None:
+            return 0
+
+        return (
+            sum(
+                user_answer.score * user_answer.question.value
+                for user_answer in self.useranswer_set.all()
+            )
+            / 100
+        )
+
     class Meta:
         unique_together = ("user", "task")
         constraints = [
@@ -115,8 +128,8 @@ class UserAnswer(models.Model):
     STR_TEXT_LIMIT = 50
 
     text = models.TextField()
-    correctness = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)]
+    score = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     comment = models.TextField()
     is_adjusted = models.BooleanField(default=False)

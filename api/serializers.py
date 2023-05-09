@@ -9,6 +9,7 @@ from core.models import (
     Task,
     TaskSession,
     CourseMembership,
+    UserAnswer,
 )
 
 
@@ -42,7 +43,17 @@ class QuestionSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "quiz")
 
 
-class CourseCreateSerializer(serializers.ModelSerializer):
+class QuestionNestedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ("id", "title", "value")
+        read_only_fields = ("id", "title", "value")
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    users = UserSerializer(many=True, read_only=True)
+    subject = SubjectNestedSerializer(many=False, read_only=True)
+
     class Meta:
         model = Course
         fields = ("id", "name", "subject", "users", "invitation_token")
@@ -60,16 +71,6 @@ class CourseCreateSerializer(serializers.ModelSerializer):
             permission=CourseMembership.UserPermission.OWNER,
         )
         return course
-
-
-class CourseSerializer(serializers.ModelSerializer):
-    users = UserSerializer(many=True, read_only=True)
-    subject = SubjectNestedSerializer(many=False, read_only=True)
-
-    class Meta:
-        model = Course
-        fields = ("id", "name", "subject", "users", "invitation_token")
-        read_only_fields = ("id", "users", "invitation_token")
 
 
 class CourseMembershipSerializer(serializers.ModelSerializer):
@@ -97,7 +98,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class QuizNestedSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+    questions = QuestionNestedSerializer(many=True, read_only=True)
 
     class Meta:
         model = Quiz
@@ -131,8 +132,43 @@ class TaskSessionDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "started_at", "finished_at", "task", "user")
 
 
+class UserAnswerSerializer(serializers.ModelSerializer):
+    question = QuestionSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = UserAnswer
+        fields = ("id", "question", "comment", "text", "score", "is_adjusted")
+
+
+class TaskSessionResultSerializer(serializers.ModelSerializer):
+    task = TaskDetailSerializer(many=False, read_only=True)
+    user_answers = UserAnswerSerializer(
+        source="useranswer_set", many=True, read_only=True
+    )
+
+    class Meta:
+        model = TaskSession
+        fields = (
+            "id",
+            "started_at",
+            "finished_at",
+            "task",
+            "user_answers",
+            "total_mark",
+        )
+
+
 class InvitationTokenSerializer(serializers.Serializer):
     invitation_token = serializers.CharField(max_length=255, required=True)
+
+
+class AnswerSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField(required=True)
+    answer = serializers.CharField(required=True)
+
+
+class TaskSessionFinishSerializer(serializers.Serializer):
+    answers = AnswerSerializer(many=True, required=True)
 
 
 class ChangeCourseUserPermissionSerializer(serializers.ModelSerializer):
