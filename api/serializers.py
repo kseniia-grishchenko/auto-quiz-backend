@@ -86,6 +86,19 @@ class CourseDetailSerializer(CourseSerializer):
     users = CourseMembershipSerializer(
         source="coursemembership_set", many=True, read_only=True
     )
+    is_admin = serializers.SerializerMethodField()
+
+    def get_is_admin(self, obj: Course) -> bool:
+        membership = CourseMembership.objects.get(
+            user=self.context["request"].user,
+            course=obj,
+        )
+
+        return membership.permission != CourseMembership.UserPermission.STUDENT
+
+    class Meta:
+        model = Course
+        fields = CourseSerializer.Meta.fields + ("is_admin",)
 
 
 class TaskSerializer(serializers.ModelSerializer):
