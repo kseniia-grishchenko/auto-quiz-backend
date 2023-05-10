@@ -132,7 +132,15 @@ class TaskSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskSession
-        fields = ("id", "started_at", "finished_at", "task", "user", "user_full_name")
+        fields = (
+            "id",
+            "started_at",
+            "finished_at",
+            "task",
+            "user",
+            "user_full_name",
+            "total_mark",
+        )
 
 
 class TaskSessionDetailSerializer(serializers.ModelSerializer):
