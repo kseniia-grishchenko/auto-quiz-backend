@@ -144,5 +144,13 @@ class UserAnswer(models.Model):
             else self.text[: UserAnswer.STR_TEXT_LIMIT] + "..."
         )
 
+    @property
+    def mark(self) -> str:
+        return (
+            "{:.2f}".format(self.question.value * (self.score / 100))
+            .rstrip("0")
+            .rstrip(".")
+        )
+
     class Meta:
         unique_together = ("question", "task_session")

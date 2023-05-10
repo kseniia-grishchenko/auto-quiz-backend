@@ -90,7 +90,6 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["POST"], name="finish")
     def finish(self, request: Request, pk: int = None, **kwargs) -> Response:
-        print(request.data)
         task = self.get_object()
 
         if datetime.datetime.now() > task.deadline + datetime.timedelta(

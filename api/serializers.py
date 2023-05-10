@@ -137,7 +137,7 @@ class UserAnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserAnswer
-        fields = ("id", "question", "comment", "text", "score", "is_adjusted")
+        fields = ("id", "question", "comment", "text", "score", "is_adjusted", "mark")
 
 
 class TaskSessionResultSerializer(serializers.ModelSerializer):
