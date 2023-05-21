@@ -14,6 +14,7 @@ from api.serializers import (
     CourseSerializer,
     InvitationTokenSerializer,
     CourseDetailSerializer,
+    CourseCreateSerializer,
     ChangeCourseUserPermissionSerializer,
 )
 from api.utils import invitation_token_verifications
@@ -40,6 +41,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
         if self.action == "retrieve":
             return CourseDetailSerializer
+
+        if self.action == "create":
+            return CourseCreateSerializer
 
         return CourseSerializer
 
