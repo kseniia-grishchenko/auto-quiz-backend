@@ -1,5 +1,6 @@
 from typing import Type
 
+from django.db import transaction
 from django.db.models import QuerySet
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -85,8 +86,20 @@ class CourseViewSet(viewsets.ModelViewSet):
             )
 
         permission = serializer.validated_data["permission"]
+        with transaction.atomic():
+            course = self.get_object()
 
         course = self.get_object()
+        course_membership = get_object_or_404(
+            CourseMembership, user=user, course=course
+        )
+        course_membership.permission = permission
+        course_membership.save()
+        # check if this teacher have access to the subject
+        if permission == CourseMembership.UserPermission.TEACHER:
+            if user not in course.subject.teachers.all():
+                # add teacher to subjects teachers
+                course.subject.teachers.add(user)
         course_membership = get_object_or_404(
             CourseMembership, user=user, course=course
         )

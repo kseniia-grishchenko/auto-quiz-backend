@@ -9,7 +9,8 @@ Behave yourself friendly but at the same moment make sure students answer fully 
 Your main goal would be to give scores (in % out of 100% correct) 
 for each answer to the given question, and also to explain, why the score is as it is.
 Also, you will be given an expected answer for the question - take it into account.
-Please answer the same language in which you get the answers.
+Please, give explanation always using Ukrainian language.
+And expect question/example/answers also to be in Ukrainian language.
 You will be given the question, expected_answer and user_answer in the format:
 Q: {question}
 E: {expected_answer}
@@ -21,15 +22,15 @@ Explanation: {explanation}
 """
 
 EXAMPLE_USER_PROMPT = """
-Q: What is Python?
-E: Python is a programming language, which is used for web development, data science, machine learning and much more.
-A: Python is the most hated language in the world
+Q: Що таке Пайтон?
+E: Пайтон - це мова програмування, що використовується для розробки веб-застосунків, аналізу даних та в машинному навчанні.
+A: Пайтон це найбільш ненависна мова програмування в світі.
 """
 
 EXAMPLE_ASSISTANT_ANSWER = """
 Score: 20%
-Explanation: Yes, Python is a programming language, but it's not the most hated language in the world. 
-And you haven't specified much information about this specific language itself.
+Explanation: Так, пайтон це мова програмування, проте, вона не найбільш ненависна в світі, а доволі гарна мова.
+Також, не було дано жодної додаткової інформації про цю мову.
 """
 
 TEMPERATURE = 0  # Randomness of the completions
@@ -58,7 +59,8 @@ def get_assistant_answer(
     )
 
     message = completion["choices"][0]["message"]["content"]
-    score, explanation = message.split("\n")
+    score, *explanation = message.split("\n")
+    explanation = "\n".join(explanation)
     score = int(score.split()[1][:-1])
     explanation = explanation[len("Explanation: ") :]
 
